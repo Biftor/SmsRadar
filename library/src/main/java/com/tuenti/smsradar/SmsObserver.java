@@ -88,7 +88,6 @@ class SmsObserver extends ContentObserver {
         int smsId=Integer.valueOf(Id);
         editor.putInt("last_sms_parsed", smsId-1);
         editor.commit();
-        Log.d("BiftorSetLastSMSID",String.valueOf(smsId-1));
     }
     
 	private void processSms(Cursor cursor) {
