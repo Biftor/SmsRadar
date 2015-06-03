@@ -17,6 +17,7 @@ package com.tuenti.smsradar;
 
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -49,11 +50,13 @@ class SmsObserver extends ContentObserver {
 
 	private ContentResolver contentResolver;
 	private SmsCursorParser smsCursorParser;
+	private Context mContext;
 
-	SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser) {
+	SmsObserver(Context context,ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser) {
 		super(handler);
 		this.contentResolver = contentResolver;
 		this.smsCursorParser = smsCursorParser;
+		this.mContext = context;
 	}
 
 	@Override
@@ -69,12 +72,25 @@ class SmsObserver extends ContentObserver {
 			cursor = getSmsContentObserverCursor();
 			if (cursor != null && cursor.moveToFirst()) {
 				processSms(cursor);
+				BiftorSetLastSMSID(cursor);
 			}
 		} finally {
 			close(cursor);
 		}
 	}
-
+/*
+*Fix for if some sms deleted
+*/
+    private void BiftorSetLastSMSID(Cursor c){
+        String Id =c.getString(c.getColumnIndexOrThrow("_id"));
+        SharedPreferences preferences = mContext.getSharedPreferences("sms_preferences",mContext.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        int smsId=Integer.valueOf(Id);
+        editor.putInt("last_sms_parsed", smsId-1);
+        editor.commit();
+        Log.d("BiftorSetLastSMSID",String.valueOf(smsId-1));
+    }
+    
 	private void processSms(Cursor cursor) {
 		Cursor smsCursor = null;
 		try {
