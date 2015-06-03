@@ -97,7 +97,7 @@ public class SmsRadarService extends Service {
 	private void initializeSmsObserver() {
 		Handler handler = new Handler();
 		SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-		this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
+		this.smsObserver = new SmsObserver(getApplicationContext(),contentResolver, handler, smsCursorParser);
 	}
 
 	private SmsCursorParser initializeSmsCursorParser() {
